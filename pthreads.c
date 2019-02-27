@@ -29,7 +29,7 @@ void* producer (void *v) {
 			items++;
 			hist[items]++;
 		}
-		pthread_cond_signal(&condition);
+		pthread_cond_broadcast(&condition);
 		pthread_mutex_unlock(&mutex);
 	}
 	return NULL;
@@ -50,7 +50,7 @@ void* consumer (void *v) {
 			items--;
 			hist[items]++;
 		}
-		pthread_cond_signal(&condition);
+		pthread_cond_broadcast(&condition);
 		pthread_mutex_unlock(&mutex);
 	}
 	return NULL;
