@@ -56,7 +56,7 @@ int main() {
 	printf("beginning...\n");
 	sem_init(&mutex, 0, 1);
 	sem_init(&full, 0, MAX_ITEMS);
-	sem_init(&empty, 0, MAX_ITEMS);
+	sem_init(&empty, 0, 0);
 
 	pthread_t producer1;
 	pthread_t producer2;
