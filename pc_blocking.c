@@ -53,7 +53,7 @@ void* consumer (void* v) {
             uthread_cond_wait(cond);
         }
         
-        if(items < MAX_ITEMS) {
+        if(items < 0) {
             items--;
             histogram[items]++;
         } else {

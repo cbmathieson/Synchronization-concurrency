@@ -25,7 +25,7 @@ void* producer (void *v) {
 			pthread_cond_wait(&condition,&mutex);
 		}
 
-		if(items < 200) {
+		if(items < MAX_ITEMS) {
 			items++;
 			hist[items]++;
 		} else {
