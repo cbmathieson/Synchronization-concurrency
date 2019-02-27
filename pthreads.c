@@ -28,6 +28,8 @@ void* producer (void *v) {
 		if(items < 200) {
 			items++;
 			hist[items]++;
+		} else {
+			i--;
 		}
 
 		pthread_cond_signal(&condition);
@@ -51,6 +53,8 @@ void* consumer (void *v) {
 		if(items > 0) {
 			items--;
 			hist[items]++;
+		} else {
+			i--;
 		}
 
 		pthread_cond_signal(&condition);
