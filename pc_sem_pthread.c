@@ -20,14 +20,16 @@ sem_t empty, full;
 void* producer (void *v) {
 
 	for(int i=0; i<NUM_ITERATIONS; i++) {
-
+	
+		sem_wait(&mutex);
 		sem_wait(&empty);
-		printf("semaphore locked\n");
 
 		items++;
 		hist[items]++;
 
 		sem_post(&full);
+
+		sem_post(&mutex);
 	}
 	return NULL;
 }
@@ -36,13 +38,14 @@ void* consumer (void *v) {
 
 	for(int i = 0; i<NUM_ITERATIONS; i++) {
 
+		sem_wait(&mutex);
 		sem_wait(&full);
-		printf("semaphore locked\n");
 
 		items--;
 		hist[items]++;
-
 		sem_post(&empty);
+
+		sem_post(&mutex);
 
 	}
 	return NULL;
@@ -51,6 +54,7 @@ void* consumer (void *v) {
 int main() {
 	
 	printf("beginning...\n");
+	sem_init(&mutex, 0, 1);
 	sem_init(&full, 0, MAX_ITEMS);
 	sem_init(&empty, 0, MAX_ITEMS);
 
