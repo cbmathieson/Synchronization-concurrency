@@ -62,6 +62,8 @@ void* consumer (void *v) {
 
 int main() {
 	
+	printf("beginning...");
+
 	pthread_t producer1;
 	pthread_t producer2;
 	pthread_t consumer1;
