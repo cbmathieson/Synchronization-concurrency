@@ -5,7 +5,8 @@
 
 #define MAX_ITEMS 10
 
-pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
+pthread_cond_t empty_condition = PTHREAD_COND_INITIALIZER;
+pthread_cond_t full_condition = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int producer_wait_count = 0;
@@ -22,7 +23,7 @@ void* producer (void *v) {
 
 		while(items >= MAX_ITEMS) {
 			producer_wait_count++;
-			pthread_cond_wait(&condition,&mutex);
+			pthread_cond_wait(&full_condition,&mutex);
 		}
 
 		if(items < MAX_ITEMS) {
@@ -32,7 +33,7 @@ void* producer (void *v) {
 			i--;
 		}
 
-		pthread_cond_signal(&condition);
+		pthread_cond_signal(&empty_condition);
 		pthread_mutex_unlock(&mutex);
 
 	}
@@ -47,7 +48,7 @@ void* consumer (void *v) {
 
 		while(items < 1) {
 			consumer_wait_count++;
-			pthread_cond_wait(&condition,&mutex);
+			pthread_cond_wait(&empty_condition,&mutex);
 		}
 
 		if(items > 0) {
@@ -57,7 +58,7 @@ void* consumer (void *v) {
 			i--;
 		}
 
-		pthread_cond_signal(&condition);
+		pthread_cond_signal(&full_condition);
 		pthread_mutex_unlock(&mutex);
 	}
 	return NULL;

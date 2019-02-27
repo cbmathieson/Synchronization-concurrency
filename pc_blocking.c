@@ -17,7 +17,8 @@ int histogram [MAX_ITEMS+1]; // histogram [i] == # of times list stored i items
 int items = 0;
 
 uthread_mutex_t mutex;
-uthread_cond_t cond;
+uthread_cond_t full_cond;
+uthread_cond_t empty_cond;
 
 void* producer (void* v) {
     for (int i=0; i<NUM_ITERATIONS; i++) {
@@ -26,7 +27,7 @@ void* producer (void* v) {
         
         while(items >= MAX_ITEMS) {
             producer_wait_count++;
-            uthread_cond_wait(cond);
+            uthread_cond_wait(full_cond);
         }
         
         if(items < MAX_ITEMS) {
@@ -35,8 +36,7 @@ void* producer (void* v) {
         } else {
             i--;
         }
-        
-        uthread_cond_signal(cond);
+        uthread_cond_signal(empty_cond);
         uthread_mutex_unlock(mutex);
     }
     return NULL;
@@ -47,20 +47,19 @@ void* consumer (void* v) {
         // TODO
         
         uthread_mutex_lock(mutex);
-        
+
         while(items < 1) {
             consumer_wait_count++;
-            uthread_cond_wait(cond);
+            uthread_cond_wait(empty_cond);
         }
         
-        if(items < 0) {
+        if(items > 0) {
             items--;
             histogram[items]++;
         } else {
             i--;
         }
-        
-        uthread_cond_signal(cond);
+        uthread_cond_signal(full_cond);
         uthread_mutex_unlock(mutex);
     }
     return NULL;
@@ -72,7 +71,8 @@ int main (int argc, char** argv) {
     uthread_init (4);
     
     mutex = uthread_mutex_create();
-    cond = uthread_cond_create(mutex);
+    full_cond = uthread_cond_create(mutex);
+    empty_cond = uthread_cond_create(mutex);
     
     uthread_t consumer1 = uthread_create(producer, NULL);
     uthread_t consumer2 = uthread_create(producer, NULL);
