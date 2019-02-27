@@ -21,6 +21,7 @@ void* producer (void *v) {
 		while(items >= MAX_ITEMS) {
 			//wait for consumption
 			producer_wait_count++;
+			printf("items @ %d", items);
 			pthread_cond_wait(&condition, &mutex);
 		}
 
@@ -29,6 +30,7 @@ void* producer (void *v) {
 			items++;
 			hist[items]++;
 		}
+		printf("unlocking cond producer");
 		pthread_cond_broadcast(&condition);
 		pthread_mutex_unlock(&mutex);
 	}
@@ -42,6 +44,7 @@ void* consumer (void *v) {
 		while(items < 1) {
 			//wait for production
 			consumer_wait_count++;
+			printf("items: %d", items);
 			pthread_cond_wait(&condition, &mutex);
 		}
 
@@ -50,6 +53,7 @@ void* consumer (void *v) {
 			items--;
 			hist[items]++;
 		}
+		printf("unlocking cond consumer");
 		pthread_cond_broadcast(&condition);
 		pthread_mutex_unlock(&mutex);
 	}
