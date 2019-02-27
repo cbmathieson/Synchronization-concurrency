@@ -79,11 +79,11 @@ int main() {
 		fprintf(stderr, "Error creating thread\n");
 		return 1;
 	}
-	if(pthread_create(&producer2, NULL, producer, NULL)) {
+	if(pthread_create(&consumer1, NULL, consumer, NULL)) {
 		fprintf(stderr, "Error creating thread\n");
 		return 1;
-	}
-	if(pthread_create(&consumer1, NULL, consumer, NULL)) {
+	} 
+	if(pthread_create(&producer2, NULL, producer, NULL)) {
 		fprintf(stderr, "Error creating thread\n");
 		return 1;
 	}
@@ -97,11 +97,11 @@ int main() {
 		fprintf(stderr, "Error joining thread\n");
 		return 2;
 	}
-	if(pthread_join(producer2, NULL)) {
+	if(pthread_join(consumer1, NULL)) {
 		fprintf(stderr, "Error joining thread\n");
 		return 2;
 	}
-	if(pthread_join(consumer1, NULL)) {
+	if(pthread_join(producer2, NULL)) {
 		fprintf(stderr, "Error joining thread\n");
 		return 2;
 	}

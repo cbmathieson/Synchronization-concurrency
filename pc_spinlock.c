@@ -20,24 +20,30 @@ spinlock_t lock;
 void* producer (void* v) {
     for (int i=0; i<NUM_ITERATIONS; i++) {
         // TODO
-        spinlock_lock(&lock);
+        //take lock
+	spinlock_lock(&lock);
         
+	//if max items, unlock and spin until not max items
         if(items >= MAX_ITEMS) {
             spinlock_unlock(&lock);
             while(items >= MAX_ITEMS){
                 producer_wait_count++;
             }
+	    //try to lock again
             spinlock_lock(&lock);
             if(items < MAX_ITEMS) {
+		//if < MAX; increment items and unlock
                 items++;
                 histogram[items]++;
                 spinlock_unlock(&lock);
             } else {
+		//if == MAX, repeat loop, unlock and try again
                 i--;
                 producer_wait_count++;
                 spinlock_unlock(&lock);
             }
         } else {
+	    //if < MAX, increment items and unlock
             items++;
             histogram[items]++;
             spinlock_unlock(&lock);
@@ -84,20 +90,20 @@ int main (int argc, char** argv) {
     // TODO: Create Threads and Join
     spinlock_create(&lock);
     
-    uthread_t consumer1 = uthread_create(producer, NULL);
-    uthread_t consumer2 = uthread_create(producer, NULL);
-    uthread_t producer1 = uthread_create(consumer, NULL);
-    uthread_t producer2 = uthread_create(consumer, NULL);
+    uthread_t consumer1 = uthread_create(consumer, NULL);
+    uthread_t producer1 = uthread_create(producer, NULL);
+    uthread_t consumer2 = uthread_create(consumer, NULL);
+    uthread_t producer2 = uthread_create(producer, NULL);
     
     if(uthread_join(consumer1, NULL)) {
         fprintf(stderr, "Failed to join thread");
         return 2;
     }
-    if(uthread_join(consumer2, NULL)) {
+    if(uthread_join(producer1, NULL)) {
         fprintf(stderr, "Failed to join thread");
         return 2;
     }
-    if(uthread_join(producer1, NULL)) {
+    if(uthread_join(consumer2, NULL)) {
         fprintf(stderr, "Failed to join thread");
         return 2;
     }
