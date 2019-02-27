@@ -14,35 +14,30 @@ int producer_wait_count = 0;     // # of times producer had to wait
 int consumer_wait_count = 0;     // # of times consumer had to wait
 int histogram [MAX_ITEMS+1]; // histogram [i] == # of times list stored i items
 
+uthread_mutex_t mutex;
+uthread_cond_t cond;
+
 int items = 0;
-spinlock_t lock;
 
 void* producer (void* v) {
   for (int i=0; i<NUM_ITERATIONS; i++) {
     // TODO
-	
-	spinlock_lock(&lock);
+	uthread_mutex_lock(mutex);
 
-	if(items >= MAX_ITEMS) {
-		spinlock_unlock(&lock);
-		while(items >= MAX_ITEMS){
-			producer_wait_count++;
-		}
-		spinlock_lock(&lock);
-		if(items < MAX_ITEMS) {
-			items++;
-			histogram[items]++;
-			spinlock_unlock(&lock);
-		} else {
-			i--;
-			producer_wait_count++;
-			spinlock_unlock(&lock);
-		}
-	} else {
+	while(items >= MAX_ITEMS) {
+		producer_wait_count++;
+		uthread_cond_wait(cond);
+	}
+
+	if(items < MAX_ITEMS) {
 		items++;
 		histogram[items]++;
-		spinlock_unlock(&lock);
+	} else {
+		i--;
 	}
+
+	uthread_cond_signal(cond);
+	uthread_mutex_unlock(mutex);
    }
    return NULL;
 }
@@ -50,29 +45,23 @@ void* producer (void* v) {
 void* consumer (void* v) {
   for (int i=0; i<NUM_ITERATIONS; i++) {
     // TODO
-	
-	spinlock_lock(&lock);
 
-	if(items < 1) {
-		spinlock_unlock(&lock);
-		while(items < 1){
-			consumer_wait_count++;
-		}
-		spinlock_lock(&lock);
-		if(items > 0) {
-			items--;
-			histogram[items]++;
-			spinlock_unlock(&lock);
-		} else {
-			i--;
-			consumer_wait_count++;
-			spinlock_unlock(&lock);
-		}
-	} else {
-		items--;
-		histogram[items]++;
-		spinlock_unlock(&lock);
-	}
+	  uthread_mutex_lock(mutex);
+
+	  while(items < 1) {
+		consumer_wait_count++;
+		uthread_cond_wait(cond);
+	  }
+
+	  if(items < MAX_ITEMS) {
+		  items--;
+		  histogram[items]++;
+  	  } else {
+		  i--;
+	  }
+
+	  uthread_cond_signal(cond);
+	  uthread_mutex_unlock(mutex);
 
   }
   return NULL;
@@ -83,7 +72,8 @@ int main (int argc, char** argv) {
 
   uthread_init (4);
 
-  spinlock_create(&lock);
+  mutex = uthread_mutex_create();
+  cond = uthread_cond_create();
   
   uthread_t consumer1 = uthread_create(producer, NULL);
   uthread_t consumer2 = uthread_create(producer, NULL);
