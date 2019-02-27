@@ -5,8 +5,8 @@
 
 #define MAX_ITEMS 10
 
-static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
+pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int producer_wait_count = 0;
 int consumer_wait_count = 0;
@@ -18,21 +18,21 @@ void* producer (void *v) {
 
 	for(int i=0; i<200; i++) {
 
+		pthread_mutex_lock(&mutex);
+
 		while(items >= MAX_ITEMS) {
-			//wait for consumption
 			producer_wait_count++;
-			printf("items @ %d", items);
-			pthread_cond_wait(&condition, &mutex);
+			pthread_cond_wait(&condition,&mutex);
 		}
 
-		pthread_mutex_lock(&mutex);
-		if(items < 200){
+		if(items < 200) {
 			items++;
 			hist[items]++;
 		}
-		printf("unlocking cond producer");
-		pthread_cond_broadcast(&condition);
+
+		pthread_cond_signal(&condition);
 		pthread_mutex_unlock(&mutex);
+
 	}
 	return NULL;
 }
@@ -41,20 +41,19 @@ void* consumer (void *v) {
 
 	for(int i = 0; i<200; i++) {
 
+		pthread_mutex_lock(&mutex);
+
 		while(items < 1) {
-			//wait for production
 			consumer_wait_count++;
-			printf("items: %d", items);
-			pthread_cond_wait(&condition, &mutex);
+			pthread_cond_wait(&condition,&mutex);
 		}
 
-		pthread_mutex_lock(&mutex);
 		if(items > 0) {
 			items--;
 			hist[items]++;
 		}
-		printf("unlocking cond consumer");
-		pthread_cond_broadcast(&condition);
+
+		pthread_cond_signal(&condition);
 		pthread_mutex_unlock(&mutex);
 	}
 	return NULL;
