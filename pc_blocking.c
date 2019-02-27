@@ -73,7 +73,7 @@ int main (int argc, char** argv) {
   uthread_init (4);
 
   mutex = uthread_mutex_create();
-  cond = uthread_cond_create();
+  cond = uthread_cond_create(mutex);
   
   uthread_t consumer1 = uthread_create(producer, NULL);
   uthread_t consumer2 = uthread_create(producer, NULL);
