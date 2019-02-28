@@ -108,7 +108,7 @@ int main() {
 		sum += hist[i];
 	}
 
-	assert (sum == NUM_ITERATIONS);
+	assert (sum == NUM_ITERATIONS*4);
 	return 0;
 }
 
