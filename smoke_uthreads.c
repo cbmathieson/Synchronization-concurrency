@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "uthread.h"
 #include "uthread_mutex_cond.h"
+#include <time.h>
 
 #define NUM_ITERATIONS 1000
 
@@ -71,6 +72,9 @@ void* agent (void* av) {
   struct Agent* a = av;
   static const int choices[]         = {MATCH|PAPER, MATCH|TOBACCO, PAPER|TOBACCO};
   static const int matching_smoker[] = {TOBACCO,     PAPER,         MATCH};
+	
+  //added a 50ms delay so agent couldnt outpace the listeners. Was only happening on macOS but just to be safe!
+  nanosleep((const struct timespec[]){{0,50000000L}}, NULL);
   
   uthread_mutex_lock (a->mutex);
     for (int i = 0; i < NUM_ITERATIONS; i++) {
