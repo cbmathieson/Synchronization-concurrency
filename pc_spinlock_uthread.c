@@ -22,7 +22,7 @@ void* producer (void* v) {
         // TODO
         //take lock
 	spinlock_lock(&lock);
-        
+
 	//if max items, unlock and spin until not max items
         if(items >= MAX_ITEMS) {
             spinlock_unlock(&lock);
