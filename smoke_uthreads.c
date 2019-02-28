@@ -82,18 +82,14 @@ void* agent (void* av) {
       signal_count [matching_smoker [r]] ++;
       int c = choices [r];
       if (c & MATCH) {
-        printf ("match available\n");
         uthread_cond_signal (a->match);
       }
       if (c & PAPER) {
-        printf ("paper available\n");
         uthread_cond_signal (a->paper);
       }
       if (c & TOBACCO) {
-        printf ("tobacco available\n");
         uthread_cond_signal (a->tobacco);
       }
-      printf ("agent is waiting for smoker to smoke\n");
       uthread_cond_wait (a->smoke);
     }
   uthread_mutex_unlock (a->mutex);
@@ -104,19 +100,14 @@ void* agent (void* av) {
 
 void check_resources() {
 
-	printf("running check resources..\n");
 	
 	if(resources.match && resources.paper){
-		printf("found match and paper!\n");
 		uthread_cond_signal(match_paper);
 	} else if(resources.match && resources.tobacco){
-		printf("found match and tobacco!\n");
 		uthread_cond_signal(match_tobacco);
 	} else if(resources.paper && resources.tobacco) {
-		printf("found paper and tobacco!\n");
 		uthread_cond_signal(paper_tobacco);
 	} else {
-		printf("returning\n");
 		return;
 	}
 
@@ -132,9 +123,7 @@ void* match_watcher (void* av) {
 	uthread_mutex_lock(v->mutex);
 	//poll for Agent to give a match
 	for(;;) {
-		printf("match watcher about to start waiting!\n");
 		uthread_cond_wait(v->match);
-		printf("match found!\n");
 		resources.match = 1;
 		check_resources();
 	}	
@@ -148,9 +137,7 @@ void* paper_watcher (void* av) {
 	uthread_mutex_lock(v->mutex);
 	//poll for Agent to give paper
 	for(;;) {
-		printf("paper watcher about to start waiting\n");
 		uthread_cond_wait(v->paper);
-		printf("paper found!\n");
 		resources.paper = 1;
 		check_resources();
 	}
@@ -164,9 +151,7 @@ void* tobacco_watcher (void* av) {
 	uthread_mutex_lock(v->mutex);
 	//poll for Agent to give tobacco
 	for(;;) {
-		printf("tobacco watcher about to start waiting!\n");
 		uthread_cond_wait(v->tobacco);
-		printf("tobacco found!\n");
 		resources.tobacco = 1;
 		check_resources();
 	}
@@ -181,7 +166,6 @@ void* match (void* av) {
 	uthread_mutex_lock(v->mutex);
 	for(;;) {
 		uthread_cond_wait(paper_tobacco);
-		printf ("match smoker is waiting\n");
 		uthread_cond_signal(v->smoke);
 		smoke_count [MATCH]++;
 	}
@@ -193,7 +177,6 @@ void* paper (void* av) {
 	uthread_mutex_lock(v->mutex);
 	for(;;) {
 		uthread_cond_wait(match_tobacco);
-		printf("paper smoker is waiting\n");
 		uthread_cond_signal(v->smoke);
 		smoke_count [PAPER]++;
 	}
@@ -206,7 +189,6 @@ void* wacki_tobacci (void* av) {
 	uthread_mutex_lock(v->mutex);
 	for(;;) {
 		uthread_cond_wait(match_paper);
-		printf("tobacco smoker is waiting\n");
 		uthread_cond_signal(v->smoke);
 		smoke_count [TOBACCO]++;
 	}
