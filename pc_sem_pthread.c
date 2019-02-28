@@ -107,9 +107,8 @@ int main() {
 		sum += hist[i];
 	}
 
-	printf("sum = %d\n", sum);
+	assert (sum == NUM_ITERATIONS);
 	return 0;
-
 }
 
 		
