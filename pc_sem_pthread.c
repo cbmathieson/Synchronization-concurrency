@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <semaphore.h>
+#include <assert.h>
 
 #define MAX_ITEMS 10
 const int NUM_ITERATIONS = 200;
