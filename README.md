@@ -20,8 +20,8 @@ make <program name>
 ## Issues encountered
 - running on macOS, pthread semaphores are depreciated
 - Also on macOS, running Smoker's problem sometimes resulted in the agent thread giving out resources before listeners had started polling, causing deadlock.
-<img src="desc/issue.png" width="100">
+<img src="desc/issue.png" width="300">
 &nbsp;
 Adding a 50ms delay once the agent thread was created seemed to give enough time for everything to catch up.
 &nbsp;
-<img src="desc/solved.png" width="100">
+<img src="desc/solved.png" width="300">
