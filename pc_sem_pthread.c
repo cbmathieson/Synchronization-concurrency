@@ -101,6 +101,10 @@ int main() {
 		return 2;
 	}
 
+	sem_destroy(&mutex);
+	sem_destroy(&full);
+	sem_destroy(&empty);
+
 	printf("item occurence count:\n");
 	int sum = 0;
 	for(int i = 0; i <= MAX_ITEMS; i++) {
