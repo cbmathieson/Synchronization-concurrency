@@ -78,6 +78,8 @@ int main (int argc, char** argv) {
         return 2;
     }
 
+    //destroy semaphores
+
     uthread_sem_destroy(mutex);
     uthread_sem_destroy(full);
     uthread_sem_destroy(empty);
@@ -89,4 +91,5 @@ int main (int argc, char** argv) {
     sum += histogram [i];
   }
   assert (sum == sizeof (t) / sizeof (uthread_t) * NUM_ITERATIONS);
+
 }

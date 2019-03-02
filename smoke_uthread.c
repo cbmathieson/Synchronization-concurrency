@@ -200,7 +200,6 @@ void* wacki_tobacci (void* av) {
 int main (int argc, char** argv) {
   uthread_init (7);
   struct Agent*  a = createAgent();
-  // TODO
   
   //initialize condition variables
   match_paper = uthread_cond_create(a->mutex);
@@ -223,4 +222,16 @@ int main (int argc, char** argv) {
   assert (smoke_count [MATCH] + smoke_count [PAPER] + smoke_count [TOBACCO] == NUM_ITERATIONS);
   printf ("Smoke counts: %d matches, %d paper, %d tobacco\n",
           smoke_count [MATCH], smoke_count [PAPER], smoke_count [TOBACCO]);
+
+  //destroy condition variables
+  uthread_cond_destroy(match_paper);
+  uthread_cond_destroy(match_tobacco);
+  uthread_cond_destroy(paper_tobacco);
+
+  uthread_cond_destroy(a->paper);
+  uthread_cond_destroy(a->match);
+  uthread_cond_destroy(a->tobacco);
+  uthread_cond_destroy(a->smoke);
+
+  uthread_mutex_destroy(a->mutex);
 }

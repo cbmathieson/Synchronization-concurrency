@@ -104,4 +104,12 @@ int main (int argc, char** argv) {
         sum += histogram [i];
     }
     assert (sum == sizeof (t) / sizeof (uthread_t) * NUM_ITERATIONS);
+
+    //destroy mutex and conditions
+    uthread_mutex_destroy(mutex);
+    uthread_cond_destroy(full_cond);
+    uthread_cond_destroy(empty_cond);
+
+    return 0;
+
 }

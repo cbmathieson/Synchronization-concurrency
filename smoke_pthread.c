@@ -233,4 +233,15 @@ int main (int argc, char** argv) {
   assert (smoke_count [MATCH] + smoke_count [PAPER] + smoke_count [TOBACCO] == NUM_ITERATIONS);
   printf ("Smoke counts: %d matches, %d paper, %d tobacco\n",
           smoke_count [MATCH], smoke_count [PAPER], smoke_count [TOBACCO]);
+
+  pthread_cond_destroy(&match_paper);
+  pthread_cond_destroy(&match_tobacco);
+  pthread_cond_destroy(&paper_tobacco);
+
+  pthread_cond_destroy(&a->paper);
+  pthread_cond_destroy(&a->match);
+  pthread_cond_destroy(&a->tobacco);
+  pthread_cond_destroy(&a->smoke);
+
+  pthread_mutex_destroy(&a->mutex);
 }
